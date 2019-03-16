@@ -1,20 +1,22 @@
-// SPRITES
+// ---------------- SPRITES ----------------
 
 var objPlayerSprite = document.getElementById("player");
 var objEnemy1Sprite = document.getElementById("enemy1");
 var objDefaultProjectileSprite = document.getElementById("projectile_default");
 
-// END SPRITES
+// ---------------- END SPRITES ----------------
 
-// VARIABLES
+// ---------------- VARIABLES ----------------
 
 //The level's width
 var intLevelWidth = 800;
+//The level's height
+var intLevelHeight = 500;
 //Canvas
 var objCanvas = document.getElementById("game");
 //Canvas size
 objCanvas.setAttribute("width", intLevelWidth);
-objCanvas.setAttribute("height", 500);
+objCanvas.setAttribute("height", intLevelHeight);
 //Canvas border
 objCanvas.style.border = "1px solid black";
 //Context
@@ -35,9 +37,9 @@ var intFireRate = 15;
 //Index used for the shots
 var intFramesLeftBeforeFiring = intFireRate;
 
-// END VARIABLES
+// ---------------- END VARIABLES ----------------
 
-// OBJECTS
+// ---------------- OBJECTS ----------------
 
 //Enemies appearing on the level
 function Enemy(objSprite, intBaseYPosition, intHealthPoints, intMovementSpeed)
@@ -72,9 +74,9 @@ function Projectile(objSprite, intBaseYPosition, intMovementSpeed, intDamage)
     };
 }
 
-// END OBJECTS
+// ---------------- END OBJECTS ----------------
 
-// FUNCTIONS
+// ---------------- FUNCTIONS ----------------
 
 //Sets the player movement when a key is pressed
 function PlayerMovement(e)
@@ -96,6 +98,15 @@ function PlayerMovement(e)
 function PlayerMovementExecute()
 {
     intPlayery += intPlayerMovementIncrement;
+    //If the player is out of the screen, move it
+    if(intPlayery < 0)
+    {
+        intPlayery = 0;
+    }
+    if(intPlayery + objPlayerSprite.height > intLevelHeight)
+    {
+        intPlayery = intLevelHeight - objPlayerSprite.height;
+    }
 }
 
 //Key release event
@@ -180,9 +191,9 @@ function CreateNewProjectile(intBaseYPosition)
     arr_activeProjectiles.push(projectile);
 }
 
-// END FUNCTIONS
+// ---------------- END FUNCTIONS ----------------
 
-// PROGRAM RUN
+// ---------------- PROGRAM RUN ----------------
 
 //Call Draw function
 var timerDraw = setInterval(Draw, 17);
