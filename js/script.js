@@ -1,4 +1,12 @@
-// CONSTANTS
+// SPRITES
+
+var objPlayerSprite = document.getElementById("player");
+var objEnemy1Sprite = document.getElementById("enemy1");
+var objDefaultProjectileSprite = document.getElementById("projectile_default");
+
+// END SPRITES
+
+// VARIABLES
 
 //The level's width
 var intLevelWidth = 800;
@@ -15,15 +23,19 @@ var ctx = objCanvas.getContext("2d");
 var arr_enemyObjects = [];
 //Array containing the projectiles
 var arr_activeProjectiles = [];
+//Player's movement speed
+var intPlayerMovementSpeed = 6;
+//Player coordinates
+var intPlayerx = 0;
+var intPlayery = objCanvas.height / 2 + objPlayerSprite.height / 2;
+//Variable for the player movement
+var intPlayerMovementIncrement = 0;
+//The number of frames between each shot
+var intFireRate = 15;
+//Index used for the shots
+var intFramesLeftBeforeFiring = intFireRate;
 
-// END CONSTANTS
-
-// SPRITES
-
-var objEnemy1Sprite = document.getElementById("enemy1");
-var objDefaultProjectileSprite = document.getElementById("projectile_default");
-
-// END SPRITES
+// END VARIABLES
 
 // OBJECTS
 
@@ -64,6 +76,34 @@ function Projectile(objSprite, intBaseYPosition, intMovementSpeed, intDamage)
 
 // FUNCTIONS
 
+//Sets the player movement when a key is pressed
+function PlayerMovement(e)
+{				
+    var key_code = e.keyCode;
+    switch(key_code){
+        case 38: //Up
+            intPlayerMovementIncrement = -intPlayerMovementSpeed;
+            break;
+        case 40: //Down
+            intPlayerMovementIncrement = intPlayerMovementSpeed;
+            break;			
+        default:
+            intPlayerMovementIncrement = 0;
+        }
+}
+
+//Moves the player
+function PlayerMovementExecute()
+{
+    intPlayery += intPlayerMovementIncrement;
+}
+
+//Key release event
+function StopPlayerMovement()
+{
+    intPlayerMovementIncrement = 0;
+}
+
 //Draws every element from the array
 function Draw()
 {
@@ -83,8 +123,8 @@ function Draw()
             }
         });
         
-        //If the enemy has no health left, we remove it
-        if(element.intHealthPoints < 1)
+        //If the enemy has no health left or went to the end of the level, we remove it
+        if(element.intHealthPoints < 1 || element.x < -element.objSprite.width)
         {
             arr_enemyObjects.splice(index, 1);
         }
@@ -100,15 +140,34 @@ function Draw()
     {
         //Before drawing the object, we move it
         element.HorizontalMovement();
+        //Delete the projectile if it reached the end of the level
+        if(element.x > element.objSprite.width + intLevelWidth)
+        {
+            arr_activeProjectiles.splice(index, 1);
+        }
         //Draw the object
         ctx.drawImage(element.objSprite, element.x, element.y);
     });
+    
+    //Moves the player
+    PlayerMovementExecute();
+    
+    //Creates a projectile if the timer is equal to 0
+    intFramesLeftBeforeFiring--;
+    if(intFramesLeftBeforeFiring == 0)
+    {
+        CreateNewProjectile(intPlayery + 0.5 * objPlayerSprite.height - 0.5 * objDefaultProjectileSprite.height);
+        intFramesLeftBeforeFiring = intFireRate;
+    }
+    
+    //Draw player
+    ctx.drawImage(objPlayerSprite, intPlayerx, intPlayery);
 }
 
 //Creates a default enemy
 function CreateNewBasicEnemy(intBaseYPosition)
 {
-    let enemy = new Enemy(objEnemy1Sprite, intBaseYPosition, 1, 2);
+    let enemy = new Enemy(objEnemy1Sprite, intBaseYPosition, 1, 3);
     //Add it to the game objects array
     arr_enemyObjects.push(enemy);
 }
@@ -116,7 +175,7 @@ function CreateNewBasicEnemy(intBaseYPosition)
 //Creates a default projectile
 function CreateNewProjectile(intBaseYPosition)
 {
-    let projectile = new Projectile(objDefaultProjectileSprite, intBaseYPosition, 3, 1);
+    let projectile = new Projectile(objDefaultProjectileSprite, intBaseYPosition, 12, 1);
     //Add it to the game objects array
     arr_activeProjectiles.push(projectile);
 }
@@ -132,5 +191,3 @@ var timerDraw = setInterval(Draw, 17);
 CreateNewBasicEnemy(50);
 CreateNewBasicEnemy(250);
 CreateNewBasicEnemy(450);
-
-CreateNewProjectile(260);
