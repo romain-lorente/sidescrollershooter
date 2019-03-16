@@ -9,7 +9,7 @@ var objDefaultProjectileSprite = document.getElementById("projectile_default");
 // ---------------- VARIABLES ----------------
 
 //The level's width
-var intLevelWidth = 800;
+var intLevelWidth = 1500;
 //The level's height
 var intLevelHeight = 500;
 //Canvas
@@ -82,7 +82,8 @@ function Projectile(objSprite, intBaseYPosition, intMovementSpeed, intDamage)
 function PlayerMovement(e)
 {				
     var key_code = e.keyCode;
-    switch(key_code){
+    switch(key_code)
+    {
         case 38: //Up
             intPlayerMovementIncrement = -intPlayerMovementSpeed;
             break;
@@ -91,7 +92,7 @@ function PlayerMovement(e)
             break;			
         default:
             intPlayerMovementIncrement = 0;
-        }
+    }
 }
 
 //Moves the player
@@ -175,6 +176,39 @@ function Draw()
     ctx.drawImage(objPlayerSprite, intPlayerx, intPlayery);
 }
 
+//Sleep function
+function sleep(ms)
+{
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+//Sends a random wave of enemies
+async function CreateEnemyWave()
+{
+    //Generate a random number
+    let intRandomWave = Math.floor(Math.random() * 2);
+    //Generates a wave depending on the result
+    switch(intRandomWave)
+    {
+        case 0: //Three basic enemies in a vertical line
+            CreateNewBasicEnemy(0);
+            CreateNewBasicEnemy((intLevelHeight - objEnemy1Sprite.height) / 2);
+            CreateNewBasicEnemy(intLevelHeight - objEnemy1Sprite.height);
+            await sleep(1500);
+            break;
+        case 1: //Three basic enemies in a diagonal line
+            CreateNewBasicEnemy(0);
+            await sleep(900);
+            CreateNewBasicEnemy((intLevelHeight - objEnemy1Sprite.height) / 2);
+            await sleep(900);
+            CreateNewBasicEnemy(intLevelHeight - objEnemy1Sprite.height);
+            await sleep(2000);
+            break;
+    }
+    //Call the function again
+    CreateEnemyWave();
+}
+
 //Creates a default enemy
 function CreateNewBasicEnemy(intBaseYPosition)
 {
@@ -198,7 +232,5 @@ function CreateNewProjectile(intBaseYPosition)
 //Call Draw function
 var timerDraw = setInterval(Draw, 17);
 
-//TEST : Creates enemies and projectiles
-CreateNewBasicEnemy(50);
-CreateNewBasicEnemy(250);
-CreateNewBasicEnemy(450);
+//Send the first wave
+CreateEnemyWave();
