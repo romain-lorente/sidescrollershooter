@@ -2,6 +2,8 @@
 
 var objPlayerSprite = document.getElementById("player");
 var objEnemy1Sprite = document.getElementById("enemy1");
+var objEnemy2Sprite = document.getElementById("enemy2");
+var objEnemy3Sprite = document.getElementById("enemy3");
 var objDefaultProjectileSprite = document.getElementById("projectile_default");
 
 // ---------------- END SPRITES ----------------
@@ -186,7 +188,7 @@ function sleep(ms)
 async function CreateEnemyWave()
 {
     //Generate a random number
-    let intRandomWave = Math.floor(Math.random() * 2);
+    let intRandomWave = Math.floor(Math.random() * 5);
     //Generates a wave depending on the result
     switch(intRandomWave)
     {
@@ -196,13 +198,37 @@ async function CreateEnemyWave()
             CreateNewBasicEnemy(intLevelHeight - objEnemy1Sprite.height);
             await sleep(1500);
             break;
-        case 1: //Three basic enemies in a diagonal line
+        case 1: //Three basic enemies in a \ line
             CreateNewBasicEnemy(0);
             await sleep(900);
             CreateNewBasicEnemy((intLevelHeight - objEnemy1Sprite.height) / 2);
             await sleep(900);
             CreateNewBasicEnemy(intLevelHeight - objEnemy1Sprite.height);
             await sleep(2000);
+            break;
+        case 2: //Three basic enemies in a / line
+            CreateNewBasicEnemy(intLevelHeight - objEnemy1Sprite.height);
+            await sleep(900);
+            CreateNewBasicEnemy((intLevelHeight - objEnemy1Sprite.height) / 2);
+            await sleep(900);
+            CreateNewBasicEnemy(0);
+            await sleep(2000);
+            break;
+        case 3: //Two basic enemies and one tough enemy in a vertical line
+            CreateNewBasicEnemy(0);
+            CreateNewToughEnemy((intLevelHeight - objEnemy3Sprite.height) / 2);
+            CreateNewBasicEnemy(intLevelHeight - objEnemy1Sprite.height);
+            await sleep(2200);
+            break;
+        case 4: //Five fast enemies in a < position
+            CreateNewFastEnemy((intLevelHeight - objEnemy2Sprite.height) / 2);
+            await sleep(200);
+            CreateNewFastEnemy(intLevelHeight / 4 - objEnemy2Sprite.height / 2);
+            CreateNewFastEnemy(intLevelHeight * 0.75 - objEnemy2Sprite.height / 2);
+            await sleep(200);
+            CreateNewFastEnemy(0);
+            CreateNewFastEnemy(intLevelHeight - objEnemy2Sprite.height);
+            await sleep(1700);
             break;
     }
     //Call the function again
@@ -212,7 +238,23 @@ async function CreateEnemyWave()
 //Creates a default enemy
 function CreateNewBasicEnemy(intBaseYPosition)
 {
-    let enemy = new Enemy(objEnemy1Sprite, intBaseYPosition, 1, 3);
+    let enemy = new Enemy(objEnemy1Sprite, intBaseYPosition, 2, 3);
+    //Add it to the game objects array
+    arr_enemyObjects.push(enemy);
+}
+
+//Creates an enemy that moves faster
+function CreateNewFastEnemy(intBaseYPosition)
+{
+    let enemy = new Enemy(objEnemy2Sprite, intBaseYPosition, 1, 5);
+    //Add it to the game objects array
+    arr_enemyObjects.push(enemy);
+}
+
+//Creates a slower enemy that is much harder to kill
+function CreateNewToughEnemy(intBaseYPosition)
+{
+    let enemy = new Enemy(objEnemy3Sprite, intBaseYPosition, 8, 2);
     //Add it to the game objects array
     arr_enemyObjects.push(enemy);
 }
