@@ -32,8 +32,10 @@ var intPlayerMovementSpeed = 6;
 //Player coordinates
 var intPlayerx = 0;
 var intPlayery = objCanvas.height / 2 + objPlayerSprite.height / 2;
+//Player's score
+var intPlayerScore = 0;
 //Variable for the player movement
-var intPlayerMovementIncrement = 0;
+var intPlayerMovementYIncrement = 0;
 //The number of frames between each shot
 var intFireRate = 15;
 //Index used for the shots
@@ -44,13 +46,14 @@ var intFramesLeftBeforeFiring = intFireRate;
 // ---------------- OBJECTS ----------------
 
 //Enemies appearing on the level
-function Enemy(objSprite, intBaseYPosition, intHealthPoints, intMovementSpeed)
+function Enemy(objSprite, intBaseYPosition, intHealthPoints, intMovementSpeed, intScore)
 {
     this.objSprite = objSprite;
     this.x = intLevelWidth;
     this.y = intBaseYPosition;
     this.intHealthPoints = intHealthPoints;
     this.intMovementSpeed = intMovementSpeed;
+    this.intScore = intScore;
     
     //Enemy's horizontal movement
     this.HorizontalMovement = function()
@@ -87,20 +90,20 @@ function PlayerMovement(e)
     switch(key_code)
     {
         case 38: //Up
-            intPlayerMovementIncrement = -intPlayerMovementSpeed;
+            intPlayerMovementYIncrement = -intPlayerMovementSpeed;
             break;
         case 40: //Down
-            intPlayerMovementIncrement = intPlayerMovementSpeed;
-            break;			
+            intPlayerMovementYIncrement = intPlayerMovementSpeed;
+            break;
         default:
-            intPlayerMovementIncrement = 0;
+            intPlayerMovementYIncrement = 0;
     }
 }
 
 //Moves the player
 function PlayerMovementExecute()
 {
-    intPlayery += intPlayerMovementIncrement;
+    intPlayery += intPlayerMovementYIncrement;
     //If the player is out of the screen, move it
     if(intPlayery < 0)
     {
@@ -115,7 +118,7 @@ function PlayerMovementExecute()
 //Key release event
 function StopPlayerMovement()
 {
-    intPlayerMovementIncrement = 0;
+    intPlayerMovementYIncrement = 0;
 }
 
 //Draws every element from the array
@@ -137,9 +140,10 @@ function Draw()
             }
         });
         
-        //If the enemy has no health left or went to the end of the level, we remove it
+        //If the enemy has no health left or went to the end of the level, we remove it and add to the player's score
         if(element.intHealthPoints < 1 || element.x < -element.objSprite.width)
         {
+            intPlayerScore += element.intScore;
             arr_enemyObjects.splice(index, 1);
         }
         
@@ -176,6 +180,12 @@ function Draw()
     
     //Draw player
     ctx.drawImage(objPlayerSprite, intPlayerx, intPlayery);
+    
+    //Draw the player's score
+    ctx.font = "25px Arial";
+    ctx.fillStyle = "#000000";
+    let strScoreDisplay = "Score : " + intPlayerScore;
+    ctx.fillText(strScoreDisplay, (intLevelWidth - ctx.measureText(strScoreDisplay).width) / 2, 32);
 }
 
 //Sleep function
@@ -188,7 +198,7 @@ function sleep(ms)
 async function CreateEnemyWave()
 {
     //Generate a random number
-    let intRandomWave = Math.floor(Math.random() * 5);
+    let intRandomWave = Math.floor(Math.random() * 6);
     
     //Generates a wave depending on the result
     if(document.hasFocus())
@@ -233,6 +243,14 @@ async function CreateEnemyWave()
                 CreateNewFastEnemy(intLevelHeight - objEnemy2Sprite.height);
                 await sleep(700);
                 break;
+            case 5: //Four normal enemies in a square position
+                CreateNewBasicEnemy((intLevelHeight - objEnemy1Sprite.height) * 0.45);
+                CreateNewBasicEnemy((intLevelHeight - objEnemy1Sprite.height) * 0.55);
+                await sleep(275);
+                CreateNewBasicEnemy((intLevelHeight - objEnemy1Sprite.height) * 0.45);
+                CreateNewBasicEnemy((intLevelHeight - objEnemy1Sprite.height) * 0.55);
+                await sleep(500);
+                break;
         }
     }
     //Wait and call the function again
@@ -243,7 +261,7 @@ async function CreateEnemyWave()
 //Creates a default enemy
 function CreateNewBasicEnemy(intBaseYPosition)
 {
-    let enemy = new Enemy(objEnemy1Sprite, intBaseYPosition, 2, 3);
+    let enemy = new Enemy(objEnemy1Sprite, intBaseYPosition, 2, 3, 100);
     //Add it to the game objects array
     arr_enemyObjects.push(enemy);
 }
@@ -251,7 +269,7 @@ function CreateNewBasicEnemy(intBaseYPosition)
 //Creates an enemy that moves faster
 function CreateNewFastEnemy(intBaseYPosition)
 {
-    let enemy = new Enemy(objEnemy2Sprite, intBaseYPosition, 1, 5);
+    let enemy = new Enemy(objEnemy2Sprite, intBaseYPosition, 1, 5, 50);
     //Add it to the game objects array
     arr_enemyObjects.push(enemy);
 }
@@ -259,7 +277,7 @@ function CreateNewFastEnemy(intBaseYPosition)
 //Creates a slower enemy that is much harder to kill
 function CreateNewToughEnemy(intBaseYPosition)
 {
-    let enemy = new Enemy(objEnemy3Sprite, intBaseYPosition, 8, 2);
+    let enemy = new Enemy(objEnemy3Sprite, intBaseYPosition, 8, 2, 500);
     //Add it to the game objects array
     arr_enemyObjects.push(enemy);
 }
