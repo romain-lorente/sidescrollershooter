@@ -189,49 +189,54 @@ async function CreateEnemyWave()
 {
     //Generate a random number
     let intRandomWave = Math.floor(Math.random() * 5);
+    
     //Generates a wave depending on the result
-    switch(intRandomWave)
+    if(document.hasFocus())
     {
-        case 0: //Three basic enemies in a vertical line
-            CreateNewBasicEnemy(0);
-            CreateNewBasicEnemy((intLevelHeight - objEnemy1Sprite.height) / 2);
-            CreateNewBasicEnemy(intLevelHeight - objEnemy1Sprite.height);
-            await sleep(1500);
-            break;
-        case 1: //Three basic enemies in a \ line
-            CreateNewBasicEnemy(0);
-            await sleep(900);
-            CreateNewBasicEnemy((intLevelHeight - objEnemy1Sprite.height) / 2);
-            await sleep(900);
-            CreateNewBasicEnemy(intLevelHeight - objEnemy1Sprite.height);
-            await sleep(2000);
-            break;
-        case 2: //Three basic enemies in a / line
-            CreateNewBasicEnemy(intLevelHeight - objEnemy1Sprite.height);
-            await sleep(900);
-            CreateNewBasicEnemy((intLevelHeight - objEnemy1Sprite.height) / 2);
-            await sleep(900);
-            CreateNewBasicEnemy(0);
-            await sleep(2000);
-            break;
-        case 3: //Two basic enemies and one tough enemy in a vertical line
-            CreateNewBasicEnemy(0);
-            CreateNewToughEnemy((intLevelHeight - objEnemy3Sprite.height) / 2);
-            CreateNewBasicEnemy(intLevelHeight - objEnemy1Sprite.height);
-            await sleep(2200);
-            break;
-        case 4: //Five fast enemies in a < position
-            CreateNewFastEnemy((intLevelHeight - objEnemy2Sprite.height) / 2);
-            await sleep(200);
-            CreateNewFastEnemy(intLevelHeight / 4 - objEnemy2Sprite.height / 2);
-            CreateNewFastEnemy(intLevelHeight * 0.75 - objEnemy2Sprite.height / 2);
-            await sleep(200);
-            CreateNewFastEnemy(0);
-            CreateNewFastEnemy(intLevelHeight - objEnemy2Sprite.height);
-            await sleep(1700);
-            break;
+        switch(intRandomWave)
+        {
+            case 0: //Three basic enemies in a vertical line
+                CreateNewBasicEnemy(0);
+                CreateNewBasicEnemy((intLevelHeight - objEnemy1Sprite.height) / 2);
+                CreateNewBasicEnemy(intLevelHeight - objEnemy1Sprite.height);
+                await sleep(500);
+                break;
+            case 1: //Three basic enemies in a \ line
+                CreateNewBasicEnemy(0);
+                await sleep(900);
+                CreateNewBasicEnemy((intLevelHeight - objEnemy1Sprite.height) / 2);
+                await sleep(900);
+                CreateNewBasicEnemy(intLevelHeight - objEnemy1Sprite.height);
+                await sleep(1000);
+                break;
+            case 2: //Three basic enemies in a / line
+                CreateNewBasicEnemy(intLevelHeight - objEnemy1Sprite.height);
+                await sleep(900);
+                CreateNewBasicEnemy((intLevelHeight - objEnemy1Sprite.height) / 2);
+                await sleep(900);
+                CreateNewBasicEnemy(0);
+                await sleep(1000);
+                break;
+            case 3: //Two basic enemies and one tough enemy in a vertical line
+                CreateNewBasicEnemy(0);
+                CreateNewToughEnemy((intLevelHeight - objEnemy3Sprite.height) / 2);
+                CreateNewBasicEnemy(intLevelHeight - objEnemy1Sprite.height);
+                await sleep(1200);
+                break;
+            case 4: //Five fast enemies in a < position
+                CreateNewFastEnemy((intLevelHeight - objEnemy2Sprite.height) / 2);
+                await sleep(200);
+                CreateNewFastEnemy(intLevelHeight / 4 - objEnemy2Sprite.height / 2);
+                CreateNewFastEnemy(intLevelHeight * 0.75 - objEnemy2Sprite.height / 2);
+                await sleep(200);
+                CreateNewFastEnemy(0);
+                CreateNewFastEnemy(intLevelHeight - objEnemy2Sprite.height);
+                await sleep(700);
+                break;
+        }
     }
-    //Call the function again
+    //Wait and call the function again
+    await sleep(1000);
     CreateEnemyWave();
 }
 
