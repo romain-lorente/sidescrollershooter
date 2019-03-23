@@ -51,6 +51,7 @@ function Enemy(objSprite, intBaseYPosition, intHealthPoints, intMovementSpeed, i
     this.objSprite = objSprite;
     this.x = intLevelWidth;
     this.y = intBaseYPosition;
+    this.intMaxHealth = intHealthPoints;
     this.intHealthPoints = intHealthPoints;
     this.intMovementSpeed = intMovementSpeed;
     this.intScore = intScore;
@@ -121,16 +122,12 @@ function StopPlayerMovement()
     intPlayerMovementYIncrement = 0;
 }
 
-//Draws every element from the array
-function Draw()
+//Moves and handles enemies before drawing
+function EnemyHandling()
 {
-    //Clear everything before drawing
-    ctx.clearRect(0, 0, objCanvas.width, objCanvas.height);
-    
-    //Handle and draw enemies
     arr_enemyObjects.forEach(function(element, index)
     {
-        //Collision checking with projectiles
+       //Collision checking with projectiles
         arr_activeProjectiles.forEach(function(projectile, projectileIndex)
         {
             if (element.x < projectile.x + projectile.objSprite.width && element.x + element.objSprite.width > projectile.x && element.y < projectile.y + projectile.objSprite.height && element.y + element.objSprite.height > projectile.y)
@@ -147,13 +144,14 @@ function Draw()
             arr_enemyObjects.splice(index, 1);
         }
         
-        //Before drawing the object, we move it
-        element.HorizontalMovement();
-        //Draw the object
-        ctx.drawImage(element.objSprite, element.x, element.y);
+        //Move the enemy
+        element.HorizontalMovement();                      
     });
-    
-    //Draw projectiles
+}
+
+//Moves and handles projectiles before drawing
+function ProjectileHandling()
+{
     arr_activeProjectiles.forEach(function(element, index)
     {
         //Before drawing the object, we move it
@@ -163,10 +161,12 @@ function Draw()
         {
             arr_activeProjectiles.splice(index, 1);
         }
-        //Draw the object
-        ctx.drawImage(element.objSprite, element.x, element.y);
     });
-    
+}
+
+//Handles the player before drawing
+function PlayerHandling()
+{
     //Moves the player
     PlayerMovementExecute();
     
@@ -177,6 +177,41 @@ function Draw()
         CreateNewProjectile(intPlayery + 0.5 * objPlayerSprite.height - 0.5 * objDefaultProjectileSprite.height);
         intFramesLeftBeforeFiring = intFireRate;
     }
+}
+
+//Draws every element from the array
+function Draw()
+{
+    //Clear everything before drawing
+    ctx.clearRect(0, 0, objCanvas.width, objCanvas.height);
+    
+    //Call handlers
+    EnemyHandling();
+    ProjectileHandling();
+    PlayerHandling();
+    
+    //Draw enemies with their health bars
+    arr_enemyObjects.forEach(function(element, index)
+    {
+        //Draw the object
+        ctx.drawImage(element.objSprite, element.x, element.y);
+        
+        //Draw a health bar for the enemy
+        //Start by drawing a black background
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(element.x, element.y, element.objSprite.width, 3);
+        //Calculate the length of the health bar according to the remaining health points
+        let nbrHealthBarLength = element.intHealthPoints / element.intMaxHealth;
+        //Then, draw the health bar
+        ctx.fillStyle = "#FF0000";
+        ctx.fillRect(element.x, element.y, element.objSprite.width * nbrHealthBarLength, 3);
+    });
+    
+    //Draw projectiles
+    arr_activeProjectiles.forEach(function(element, index)
+    {
+        ctx.drawImage(element.objSprite, element.x, element.y);
+    });
     
     //Draw player
     ctx.drawImage(objPlayerSprite, intPlayerx, intPlayery);
